@@ -146,7 +146,7 @@ TEST(WorkflowTest, CountWordsTest) {
 
 TEST(FileManagerTest, SaveOutputTest) {
     // Initialize FileManager object with output directory
-    FileManager fm("test_output_dir");
+    FileManager fm("D:\\output-test");
 
     // Create a test string with some words and their counts
     std::string test_output = "apple 5\nbanana 3\norange 2\n";
@@ -158,7 +158,7 @@ TEST(FileManagerTest, SaveOutputTest) {
     EXPECT_EQ(result, 0);
 
     // Check if output file was created in the correct directory
-    std::string output_file_path = "test_output_dir/output.txt";
+    std::string output_file_path = "D:\\output-test\\output.txt";
     EXPECT_TRUE(std::filesystem::exists(output_file_path));
 
     // Read the output file and compare it with the test string
@@ -174,7 +174,7 @@ TEST(FileManagerTest, SaveOutputTest) {
 
 TEST(FileManagerTest, SaveTempTest) {
     // Initialize FileManager object with temp directory
-    FileManager fm("", "", "test_temp_dir");
+    FileManager fm("", "", "D:\\tempfiles-test");
 
     // Create a test string and a filename
     std::string test_output = "test output string";
@@ -187,7 +187,7 @@ TEST(FileManagerTest, SaveTempTest) {
     EXPECT_EQ(result, 0);
 
     // Check if temp file was created in the correct directory with the correct name
-    std::string temp_file_path = "test_temp_dir/test_file.txt";
+    std::string temp_file_path = "D:\\tempfiles-test\\test_file.txt";
     EXPECT_TRUE(std::filesystem::exists(temp_file_path));
 
     // Read the temp file and compare it with the test string
