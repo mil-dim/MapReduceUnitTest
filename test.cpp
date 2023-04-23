@@ -149,7 +149,7 @@ TEST(FileManagerTest, SaveOutputTest) {
     FileManager fm("D:\\output-test");
 
     // Create a test string with some words and their counts
-    std::string test_output = "apple 5\nbanana 3\norange 2\n";
+    std::string test_output = "apple 5\nbanana 1\norange 2\n";
 
     // Call SaveOutput function
     int result = fm.SaveOutput(test_output);
@@ -161,15 +161,15 @@ TEST(FileManagerTest, SaveOutputTest) {
     std::string output_file_path = "D:\\output-test\\output.txt";
     EXPECT_TRUE(std::filesystem::exists(output_file_path));
 
-    // Read the output file and compare it with the test string
+    // Read the output file and compare it with the test string, it should be sorted
     std::ifstream output_file(output_file_path);
     std::string line;
     std::getline(output_file, line);
     EXPECT_EQ(line, "apple 5");
     std::getline(output_file, line);
-    EXPECT_EQ(line, "banana 3");
-    std::getline(output_file, line);
     EXPECT_EQ(line, "orange 2");
+    std::getline(output_file, line);
+    EXPECT_EQ(line, "banana 1");
 }
 
 TEST(FileManagerTest, SaveTempTest) {
