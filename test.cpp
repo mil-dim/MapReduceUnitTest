@@ -32,6 +32,27 @@ protected:
     std::string test_file_path = "test_file.txt";
 };
 
+
+TEST_F(MapperTest, MapTestNoInputFile) {
+    Mapper mapper;
+    std::unordered_map<std::string, int> word_counts;
+    int ret = mapper.Map("no-input-file", word_counts);
+    EXPECT_EQ(ret, 6);
+   
+}
+
+TEST_F(MapperTest, MapTestNoInputFileAccess) {
+    boost::filesystem::create_directory("input-test1");
+   //the file1.txt inside is removed perms from teh shell
+
+    Mapper mapper;
+    std::unordered_map<std::string, int> word_counts;
+    int ret = mapper.Map("input-test1\\file1.txt", word_counts);
+    EXPECT_EQ(ret, 6);
+  
+
+}
+
 TEST_F(MapperTest, MapTest) {
     Mapper mapper;
     std::unordered_map<std::string, int> word_counts;
@@ -120,7 +141,9 @@ TEST(SortOutputByFrequencyTest, SortOutputTest) {
 
 TEST(WorkflowTest, CountWordsTest) {
     // Set up input and output directories
-
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
     std::string input_dir = "input-test";
     std::string output_dir = "output-test";
     std::string temp_dir = "tempfiles-test";
@@ -146,6 +169,10 @@ TEST(WorkflowTest, CountWordsTest) {
     std::string output((std::istreambuf_iterator<char>(output_file)),
         std::istreambuf_iterator<char>());
     ASSERT_EQ("apple: 3\norange: 1\nbanana: 1\n", output);
+    output_file.close();
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
 }
 
 
@@ -236,6 +263,9 @@ TEST(MainTest, ValidArguments) {
     */
     
     // Call the main function with test arguments
+      boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
     boost::filesystem::create_directory("output-test");
     boost::filesystem::create_directory("input-test");
     boost::filesystem::create_directory("tempfiles-test");
@@ -248,7 +278,9 @@ TEST(MainTest, ValidArguments) {
     EXPECT_EQ(exit_code, 0);
 
 
-  
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
     // Remove the test directories
   //  boost::filesystem::remove_all(input-test);
    // boost::filesystem::remove_all(output-test);
@@ -256,6 +288,12 @@ TEST(MainTest, ValidArguments) {
 }
 
 TEST(MainTest, InValidInputDir) {
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
     // Call the main function with test arguments
     char* argv[] = { "main_test", "input_test-bad" , "output-test" ,"tempfiles-test" };
 
@@ -263,6 +301,9 @@ TEST(MainTest, InValidInputDir) {
 
     // Check that the exit code is 0, indicating success
     EXPECT_EQ(exit_code, 5);
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
 }
 
 // Test the main function with invalid arguments
@@ -277,21 +318,41 @@ TEST(MainTest, InvalidArguments) {
 
 TEST(MainTest, InValidOutputDir) {
     // Call the main function with test arguments
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
     char* argv[] = { "main_test", "input-test" , "output-test-bad" ,"tempfiles-test" };
 
     int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
     // Check that the exit code is 0, indicating success
     EXPECT_EQ(exit_code, 8);
+
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
 }
 TEST(MainTest, InValidTempDir) {
     // Call the main function with test arguments
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
     char* argv[] = { "main_test", "input-test" , "output-test" ,"tempfiles-test-bad" };
 
     int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
     // Check that the exit code is 0, indicating success
     EXPECT_EQ(exit_code, 7);
+
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
 }
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);
