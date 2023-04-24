@@ -120,9 +120,16 @@ TEST(SortOutputByFrequencyTest, SortOutputTest) {
 
 TEST(WorkflowTest, CountWordsTest) {
     // Set up input and output directories
-    std::string input_dir = "C:\\Users\\d_mil\\OneDrive\\Escritorio\\OOD\\shakespeare-test";
-    std::string output_dir = "D:\\output-test";
-    std::string temp_dir = "D:\\tempfiles-test";
+
+    std::string input_dir = "input-test";
+    std::string output_dir = "output-test";
+    std::string temp_dir = "tempfiles-test";
+
+    boost::filesystem::create_directory(input_dir);
+    boost::filesystem::create_directory(output_dir);
+    boost::filesystem::create_directory(temp_dir);
+
+
 
     // Create an input file
     std::string input_file_path = input_dir + "/input.txt";
@@ -145,8 +152,10 @@ TEST(WorkflowTest, CountWordsTest) {
 
 
 TEST(FileManagerTest, SaveOutputTest) {
+    boost::filesystem::create_directory("output-test");
+
     // Initialize FileManager object with output directory
-    FileManager fm("D:\\output-test");
+    FileManager fm("output-test");
 
     // Create a test string with some words and their counts
     std::string test_output = "apple 5\nbanana 1\norange 2\n";
@@ -158,7 +167,7 @@ TEST(FileManagerTest, SaveOutputTest) {
     EXPECT_EQ(result, 0);
 
     // Check if output file was created in the correct directory
-    std::string output_file_path = "D:\\output-test\\output.txt";
+    std::string output_file_path = "output-test\\output.txt";
     EXPECT_TRUE(std::filesystem::exists(output_file_path));
 
     // Read the output file and compare it with the test string, it should be sorted
@@ -173,8 +182,10 @@ TEST(FileManagerTest, SaveOutputTest) {
 }
 
 TEST(FileManagerTest, SaveTempTest) {
+    boost::filesystem::create_directory("tempfiles-test");
+
     // Initialize FileManager object with temp directory
-    FileManager fm("", "", "D:\\tempfiles-test");
+    FileManager fm("", "", "tempfiles-test");
 
     // Create a test string and a filename
     std::string test_output = "test output string";
@@ -187,7 +198,7 @@ TEST(FileManagerTest, SaveTempTest) {
     EXPECT_EQ(result, 0);
 
     // Check if temp file was created in the correct directory with the correct name
-    std::string temp_file_path = "D:\\tempfiles-test\\test_file.txt";
+    std::string temp_file_path = "tempfiles-test\\test_file.txt";
     EXPECT_TRUE(std::filesystem::exists(temp_file_path));
 
     // Read the temp file and compare it with the test string
@@ -225,7 +236,11 @@ TEST(MainTest, ValidArguments) {
     */
     
     // Call the main function with test arguments
-    char* argv[] = { "main_test", "C:\\Users\\d_mil\\OneDrive\\Escritorio\\OOD\\shakespeare1" , "D:\\output" ,"D:\\tempfiles"};
+    boost::filesystem::create_directory("output-test");
+    boost::filesystem::create_directory("input-test");
+    boost::filesystem::create_directory("tempfiles-test");
+
+    char* argv[] = { "main_test", "input-test" , "output-test" ,"tempfiles-test"};
 
  int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
@@ -233,24 +248,16 @@ TEST(MainTest, ValidArguments) {
     EXPECT_EQ(exit_code, 0);
 
 
-  /*
-   // Check that the output file was created and contains the expected content
-    std::string output_path = (output_dir / "output.txt").string();
-    std::ifstream output_file(output_path);
-    std::stringstream expected_output;
-    expected_output << "word4 4\nword3 3\nword2 2\nword1 1\n";
-    std::stringstream actual_output;
-    actual_output << output_file.rdbuf();
-    EXPECT_EQ(expected_output.str(), actual_output.str()); */
+  
     // Remove the test directories
-  //  boost::filesystem::remove_all(input_dir);
-   // boost::filesystem::remove_all(output_dir);
-   // boost::filesystem::remove_all(temp_dir);
+  //  boost::filesystem::remove_all(input-test);
+   // boost::filesystem::remove_all(output-test);
+   // boost::filesystem::remove_all(temp-test);
 }
 
 TEST(MainTest, InValidInputDir) {
     // Call the main function with test arguments
-    char* argv[] = { "main_test", "C:\\Users\\d_mil\\OneDrive\\Escritorio\\OOD\\shakespeare-bad" , "D:\\output" ,"D:\\tempfiles" };
+    char* argv[] = { "main_test", "input_test-bad" , "output-test" ,"tempfiles-test" };
 
     int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
@@ -270,7 +277,7 @@ TEST(MainTest, InvalidArguments) {
 
 TEST(MainTest, InValidOutputDir) {
     // Call the main function with test arguments
-    char* argv[] = { "main_test", "C:\\Users\\d_mil\\OneDrive\\Escritorio\\OOD\\shakespeare1" , "D:\\output-bad" ,"D:\\tempfiles" };
+    char* argv[] = { "main_test", "input-test" , "output-test-bad" ,"tempfiles-test" };
 
     int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
@@ -279,7 +286,7 @@ TEST(MainTest, InValidOutputDir) {
 }
 TEST(MainTest, InValidTempDir) {
     // Call the main function with test arguments
-    char* argv[] = { "main_test", "C:\\Users\\d_mil\\OneDrive\\Escritorio\\OOD\\shakespeare1" , "D:\\output" ,"D:\\tempfiles-bad" };
+    char* argv[] = { "main_test", "input-test" , "output-test" ,"tempfiles-test-bad" };
 
     int exit_code = main_test(sizeof(argv) / sizeof(char*), argv);
 
