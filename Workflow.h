@@ -1,5 +1,5 @@
-#ifndef WORDCOUNTER_H
-#define WORDCOUNTER_H
+#ifndef WORKFLOW_H
+#define WORKFLOW_H
 
 #include <string>
 #include "Mapper.h"
@@ -22,4 +22,4 @@ private:
 
 };
 
-#endif // WORDCOUNTER_H
+#endif // WORKFLOW_H

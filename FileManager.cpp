@@ -79,12 +79,7 @@ int FileManager::SaveOutput(const std::string& output) {
 //save the exit status , the result , Success or Fail string
 void FileManager::SaveResult(const std::string& result) {
     fs::path output_path(output_dir_);
-    if (!fs::exists(output_path)) {
-        std::cerr << "Output directory does not exist: " << output_dir_ << std::endl;
-        FileManager fm(env_temp);
-        fm.SaveResult("FAIL - no output dir - exit 8");
-        return ;
-    }
+
     output_path /= "result.txt";
     std::ofstream output_file(output_path.string());
     if (!output_file.is_open()) {

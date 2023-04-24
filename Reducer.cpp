@@ -26,7 +26,7 @@ std::unordered_map<std::string, int> Reducer::reduce() {
 
         while (getline(infile, line)) {
        // std::cout << "after the if of the reducer " << entry  << " " << line << " \n";
-            //reading a line and looks for teh separator : position
+            //reading a line and looks for the separator : position
             size_t pos = line.find(":");
             if (pos != std::string::npos) {
                 //then splitting by that position, first part is teh word, secont - the count
