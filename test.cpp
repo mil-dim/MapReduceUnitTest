@@ -379,9 +379,9 @@ TEST(MainTest, DefaultWrong7) {
         "--reduce_func=reduceWrapper-wrong"
     };
     EXPECT_EQ(main_test(argc, argv), 14);
-    boost::filesystem::remove_all("input-test");
-    boost::filesystem::remove_all("output-test");
-    boost::filesystem::remove_all("tempfiles-test");
+    boost::filesystem::remove_all("test_input");
+    boost::filesystem::remove_all("test_output");
+    boost::filesystem::remove_all("test_temp");
 }
 
 
