@@ -10,7 +10,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "Main.cpp"
 
 namespace fs1 = std::filesystem;
 
@@ -222,22 +221,168 @@ TEST(FileManagerTest, SaveTempTest) {
 }
 
 
+int main_test(int argc, char** argv);
 
-TEST(MainTest, CanCountWords) {
-    int argc = 7;
+TEST(MainTest, TestAllExplicitArguments) {
+
+    boost::filesystem::create_directory("test_input");
+    boost::filesystem::create_directory("test_output");
+    boost::filesystem::create_directory("test_temp");
+
+
+    std::string input_file_path =  "test_input/input.txt";
+    std::ofstream input_file(input_file_path);
+    input_file << "apple\napple\napple apple \napple orange\nbanana apple\n";
+    input_file.close();
+
+    int argc = 8;
     char* argv[] = {
         "program_name",
         "--input_dir=test_input",
         "--output_dir=test_output",
         "--temp_dir=test_temp",
-        "--map_dll=test_mapper.dll",
-        "--reduce_dll=test_reducer.dll",
-        "--map_func=mapWrapper"
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+
     };
     EXPECT_EQ(main_test(argc, argv), 0);
+
 }
 
 
+
+TEST(MainTest, TestAllDefaultValues) {
+
+    int argc = 2;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+
+    };
+    EXPECT_EQ(main_test(argc, argv), 0);
+
+}
+
+TEST(MainTest, NoInput) {
+
+    int argc = 1;
+    char* argv[] = {
+        "program_name",
+    };
+    EXPECT_EQ(main_test(argc, argv), 1);
+}
+
+TEST(MainTest, DefaultWrong1) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input-wrong",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 5);
+}
+
+TEST(MainTest, DefaultWrong2) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output-wronf",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 8);
+}
+TEST(MainTest, DefaultWrong3) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_inpu",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp-wrong",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 5);
+}
+TEST(MainTest, DefaultWrong4) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll-wrong",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 13);
+}
+TEST(MainTest, DefaultWrong5) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll-wrong",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 15);
+}
+TEST(MainTest, DefaultWrong6) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper-wrong",
+        "--reduce_func=reduceWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 12);
+}
+TEST(MainTest, DefaultWrong7) {
+
+    int argc = 8;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=\\libs\\Mapper.dll",
+        "--reduce_dll=\\libs\\Reducer1.dll",
+        "--map_func=mapWrapper",
+        "--reduce_func=reduceWrapper-wrong"
+    };
+    EXPECT_EQ(main_test(argc, argv), 14);
+    boost::filesystem::remove_all("input-test");
+    boost::filesystem::remove_all("output-test");
+    boost::filesystem::remove_all("tempfiles-test");
+}
 
 
 int main(int argc, char** argv) {
