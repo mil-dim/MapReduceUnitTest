@@ -251,7 +251,17 @@ TEST(MainTest, TestAllExplicitArguments) {
 
 }
 
+TEST(MainTest, TestHelp) {
 
+    int argc = 2;
+    char* argv[] = {
+        "program_name",
+        "--help",
+
+    };
+    EXPECT_EQ(main_test(argc, argv), 0);
+
+}
 
 TEST(MainTest, TestAllDefaultValues) {
 
