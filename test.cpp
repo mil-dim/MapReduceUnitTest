@@ -10,6 +10,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "Main.cpp"
+
 namespace fs1 = std::filesystem;
 
 
@@ -221,7 +223,19 @@ TEST(FileManagerTest, SaveTempTest) {
 
 
 
-
+TEST(MainTest, CanCountWords) {
+    int argc = 7;
+    char* argv[] = {
+        "program_name",
+        "--input_dir=test_input",
+        "--output_dir=test_output",
+        "--temp_dir=test_temp",
+        "--map_dll=test_mapper.dll",
+        "--reduce_dll=test_reducer.dll",
+        "--map_func=mapWrapper"
+    };
+    EXPECT_EQ(main_test(argc, argv), 0);
+}
 
 
 
