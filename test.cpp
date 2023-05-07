@@ -14,8 +14,6 @@
 namespace fs1 = std::filesystem;
 
 
-
-
 TEST(WorkflowTest, CountWordsTest) {
     // Set up input and output directories
     boost::filesystem::remove_all("input-test");
