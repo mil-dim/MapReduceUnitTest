@@ -101,7 +101,6 @@ TEST(WorkflowTest, CountWordsTestOneWord) {
     boost::filesystem::remove_all("tempfiles-test");
 }
 
-
 TEST(WorkflowTest, CountWordsTestManyFiles) {
     // Set up input and output directories
     boost::filesystem::remove_all("input-test");
