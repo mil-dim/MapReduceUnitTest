@@ -2,15 +2,29 @@
 #define OUTPUTSAVER_H
 
 
+#include <iomanip> // for std::put_time
+#include <ctime>   // for std::time
+#include <sstream> // for std::stringstream
+#include <string>  // for std::string
+#include <fstream> // for std::ofstream
+#include <iostream>// for std::cerr
+#include <vector>  // for std::vector
+#include <utility> // for std::pair
+#include <algorithm> // for std::sort
+#include <boost/filesystem.hpp> // for boost::filesystem
+#include <boost/uuid/uuid.hpp> // for boost::uuids::uuid
+#include <boost/uuid/uuid_generators.hpp> // for boost::uuids::random_generator
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/file.hpp>
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <utility>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
-#include <boost/filesystem.hpp>
+namespace keywords = boost::log::keywords;
+
+namespace logging = boost::log;
+
+
+
+
 
 namespace fs = boost::filesystem;
 
@@ -21,10 +35,13 @@ public:
 
     int SaveOutput(const std::string& output);
     void SaveResult(const std::string& result);
-    int  SaveTemp(const std::string& result, const std::string& filename);
+    int  SaveTemp(const std::string& buffer);
     int CheckDirs();
+    int GetInput(const std::string& file, std::string& buffer);
+
 
 private:
+    std::string dir_;
     std::string output_dir_;
     std::string input_dir_;
     std::string temp_dir_;

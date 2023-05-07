@@ -39,18 +39,12 @@
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="FileManager.h" />
-    <ClInclude Include="Mapper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Reducer.h" />
-    <ClInclude Include="SortOutputByFrequency.h" />
     <ClInclude Include="Workflow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Mapper.cpp" />
-    <ClCompile Include="Reducer.cpp" />
-    <ClCompile Include="SortOutputByFrequency.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

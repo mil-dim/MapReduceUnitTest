@@ -7,11 +7,12 @@ bool FileManager::is_the_first_instance_ = true;
 //output, and temporary directories.Both constructors take in strings that 
 //represent directory paths.These paths are used later by the class functions to readand write files.
 FileManager::FileManager(const std::string& output_dir)
-    : output_dir_(output_dir) {}
+    : dir_(output_dir) {}
 //the second constructor is used for managing TEMP dir and its cleaning it on teh first use
 //after it runs once , first time, it clean all teh temp files from teh previous run
 FileManager::FileManager(const std::string& input_dir, const std::string& output_dir, const std::string& temp_dir)
     : output_dir_(output_dir) , temp_dir_(temp_dir), input_dir_(input_dir) {
+
     if (is_the_first_instance_) {
         fs::path dir(temp_dir_);
         if (fs::is_directory(dir)) {
@@ -24,6 +25,40 @@ FileManager::FileManager(const std::string& input_dir, const std::string& output
         //then sets the flag for teh first run to false, so no more fiel deletions
     }
 }
+
+
+int FileManager::GetInput(const std::string& file,  std::string& buffer) {
+    std::ostringstream oss;
+    std::string word;
+    int words_read = 0;
+
+    //    std::cout << " from GetInput " << words_read << word << file << " \n";
+     
+
+   std::ifstream ifs(file);
+        if (!ifs.is_open()) {
+            BOOST_LOG_TRIVIAL(warning) << "Warning - Error opening file   " << file;
+
+            return 0;
+        }
+
+        while (ifs >> word ) {
+            oss << word << " ";
+            words_read++;
+        }
+
+        ifs.close();
+    
+
+    buffer = oss.str();
+
+   // std::cout << " from total GetInput " << total_words_read << buffer << " \n";
+
+    return words_read;
+}
+
+
+
 
 //takes a string representing the output and saves it to a file named 
 //"output.txt" in the specified output directory. 
@@ -45,20 +80,12 @@ int FileManager::SaveOutput(const std::string& output) {
     //It takes two parameters, a and b, which are the elements being compared during sorting. 
     //The auto keyword is used to let the compiler deduce the type of a and b automatically.
 
-    std::sort(word_counts.begin(), word_counts.end(), [](const auto& a, const auto& b) {
+   std::sort(word_counts.begin(), word_counts.end(), [](const auto& a, const auto& b) {
         return a.second > b.second;
         });
 
-    fs::path output_path(output_dir_);
-    if (!fs::exists(output_path)) {
-        //if there is no output dir with that name , write FAIL in the default TEMP
-        //because if no output dir is specified, temp dir is probably also not specified
-        std::cerr << "Output directory does not exist: " << output_dir_ << std::endl;
-        FileManager fm(env_temp);
-        std::cout << env_temp << "\n";
-        fm.SaveResult("FAIL - no output dir - exit 2");
-        return 2;
-    }
+    fs::path output_path(dir_);
+   
     output_path /= "output.txt";
     //construct the full path to teh output file
     std::ofstream output_file(output_path.string());
@@ -66,6 +93,8 @@ int FileManager::SaveOutput(const std::string& output) {
     //it will be saved in the specified TEMPFILE dir.
     if (!output_file.is_open()) {
         std::cerr << "Error creating output file " << output_path << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Error creating output file " << output_path;
+
         return 3;
     }
     for (const auto& word_count : word_counts) {
@@ -78,12 +107,14 @@ int FileManager::SaveOutput(const std::string& output) {
 
 //save the exit status , the result , Success or Fail string
 void FileManager::SaveResult(const std::string& result) {
-    fs::path output_path(output_dir_);
+    fs::path output_path(dir_);
 
     output_path /= "result.txt";
     std::ofstream output_file(output_path.string());
     if (!output_file.is_open()) {
         std::cerr << "Error creating result file " << output_path << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Error creating result file " << output_path;
+
         return;
     }
     output_file << result << "\n";
@@ -92,47 +123,63 @@ void FileManager::SaveResult(const std::string& result) {
 
 
 
-int FileManager::SaveTemp(const std::string& result , const std::string& filename) {
-    fs::path temp_path(temp_dir_);
-    if (!fs::exists(temp_path)) {
-        std::cerr << "Temp directory does not exist: " << temp_dir_ << std::endl;
-        //if there is no output dir with that name , write FAIL in the default TEMP
-      //because if no output dir is specified, temp dir is probably also not specified
-        FileManager fm(env_temp);
-        fm.SaveResult("FAIL - no temp dir - 7 ");
-        return 7;
-    }
+int FileManager::SaveTemp(const std::string& buffer ) {
+    fs::path temp_path(dir_);
+       // Generate a random unique file name using the uuid library
+    boost::uuids::random_generator gen;
+    std::string rand = boost::uuids::to_string(gen());
 
-    temp_path /= filename;
+    // Generate a unique file name based on the current timestamp and a counter
+    std::time_t now = std::time(nullptr);
+    struct tm timeinfo;
+    localtime_s(&timeinfo, &now);
+  //  std::cout << " from Save Temp \n";
+    std::stringstream file_name_ss;
+    file_name_ss << std::put_time(&timeinfo, "%Y%m%d-%H%M%S") << "-" << rand << ".tmp";
+    std::string file_name = file_name_ss.str();
+
+    temp_path /= file_name;
     std::ofstream temp_file(temp_path.string());
     if (!temp_file.is_open()) {
         std::cerr << "Error creating temp file " << temp_path << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Error creating temp file   " << temp_path;
+
         return 9;
     }
-    temp_file << result << "\n";
+    temp_file << buffer << "\n";
     temp_file.close();
+
+    // Increment the temporary file counter
     return 0;
 }
+
+
+
+
 int FileManager::CheckDirs() {
 
     fs::path input_path(input_dir_);
     if (!fs::exists(input_path)) {
         std::cerr << "Input directory does not exist: " << input_dir_ << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Input directory does not exist: " << input_dir_;
         return 5;
     }
 
     fs::path output_path(output_dir_);
     if (!fs::exists(output_path)) {
         std::cerr << "Output directory does not exist: " << output_dir_ << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Output directory does not exist: " << output_dir_;
         return 8;
     }
 
     fs::path temp_path(temp_dir_);
     if (!fs::exists(temp_path)) {
         std::cerr << "Temp directory does not exist: " << temp_dir_ << std::endl;
+        BOOST_LOG_TRIVIAL(error) << "Temp directory does not exist: " << temp_dir_;
         return 7;
             }
 
     return 0;
+
 
 }

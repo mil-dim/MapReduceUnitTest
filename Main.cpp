@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,69 +7,89 @@
 #include <cstdlib>
 #include <unordered_map>
 #include <boost/filesystem.hpp>
-
 #include <boost/range/iterator_range.hpp>
-#include <fstream> // add this line
-#include "Reducer.h"
-#include "SortOutputByFrequency.h"
+#include <fstream>
 #include "Workflow.h"
-#include "Mapper.h"
 #include "FileManager.h"
+#include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/program_options.hpp>
 
-
-
+namespace keywords = boost::log::keywords;
+namespace logging = boost::log;
 namespace fs = boost::filesystem;
-
-static char* env_temp = []() { 
-    const char* env_var_name = "TEMP";
-    char* env_var_value;
-    size_t env_var_size;
-
-    errno_t err = _dupenv_s(&env_var_value, &env_var_size, env_var_name);
-    if (err != 0 || env_var_value == nullptr) {
-        std::cerr << "Failed to read environment variable " << env_var_name << std::endl;
-        return static_cast<char*>(nullptr);
-    }
-
-    return env_var_value;
-}();
-
+namespace po = boost::program_options;
 
 int main_test(int argc, char** argv) {
     int exit_code = 0;
+    std::string inputDir;
+    std::string outputDir;
+    std::string tempDir;
+    std::string mapDll;
+    std::string reduceDll;
+    std::string mapFunc;
+    std::string reduceFunc;
 
-    //if there are no 3 additional argumants - fail
-    if (argc < 4) {
-        std::cerr << "Usage: " << argv[0] << " <input_directory> <output_directory> <temp_directory>" << std::endl;
-        //if the arguments are not provided, will drop the Satatus file in the Default TEMP dir
-        // Filemanager constructor initialize for D://temp
-        FileManager fm(env_temp); 
-        //Save the exft message in a file ( hardcoded name result.txt in the class FileManager
-        fm.SaveResult("FAIL - not enough argiments - exit 1");
-        return 1; //exit code 1 for that error
+
+
+
+    logging::add_file_log("\\output_default\\mapreduce.log", keywords::open_mode = std::ios_base::app);
+    std::time_t now = std::time(nullptr);
+    struct tm timeinfo;
+    localtime_s(&timeinfo, &now);
+    std::stringstream file_name_ss;
+    BOOST_LOG_TRIVIAL(info) << "Started At : " << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
+
+    boost::program_options::options_description desc("Options");
+    desc.add_options()
+        ("help", "produce help message")
+        ("input_dir", boost::program_options::value<std::string>(&inputDir)->required(), "input directory")
+        ("output_dir", boost::program_options::value<std::string>(&outputDir)->default_value("\\output_default"), "output directory")
+        ("temp_dir", boost::program_options::value<std::string>(&tempDir)->default_value("\\tempfiles_default"), "temp directory")
+        ("map_dll", boost::program_options::value<std::string>(&mapDll)->default_value("\\libs\\Mapper.dll"), "map dll")
+        ("reduce_dll", boost::program_options::value<std::string>(&reduceDll)->default_value("\\libs\\Reducer1.dll"), "reduce dll")
+        ("map_func", boost::program_options::value<std::string>(&mapFunc)->default_value("mapWrapper"), "map func name")
+        ("reduce_func", boost::program_options::value<std::string>(&reduceFunc)->default_value("reduceWrapper"), "reduce func name");
+
+    po::variables_map vm;
+ 
+
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+
+        if (vm.count("help")) {
+            std::cout << desc << "\n";
+            return 0;
+        }
+
+        po::notify(vm);
     }
-    //getting the  3 dirs from teh 3 arguments
-    std::string input_dir(argv[1]);
-    std::string output_dir(argv[2]);
-    std::string temp_dir(argv[3]);
+    catch (std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
 
-    FileManager fmtest(input_dir,output_dir,temp_dir);
-     exit_code=fmtest.CheckDirs();
+    //std::cout << inputDir << " " << outputDir << " " << tempDir << " " << mapDll << " " << reduceDll << " " << mapFunc << " " << reduceFunc << " \n";
+    BOOST_LOG_TRIVIAL(info) << inputDir << " " << outputDir << " " << tempDir << " " << mapDll << " " << reduceDll << " " << mapFunc << " " << reduceFunc << " ";
 
-     if (exit_code == 0) {
 
-         //this is teh WorkFlow class, managing all
-         Workflow wc(input_dir, output_dir, temp_dir);
-         // gets teh exit code how teh process of counting finished
-         exit_code = wc.CountWords();
-     
-    //and saves it in teh out_dir result.txt file by teh FM
-    FileManager fm(output_dir);
-    if (exit_code == 0) 
+    FileManager fmtest(inputDir, outputDir, tempDir);
+    exit_code = fmtest.CheckDirs();
+
+    if (exit_code == 0) {
+        Workflow wc(inputDir, outputDir, tempDir , mapDll , reduceDll , mapFunc , reduceFunc);
+        exit_code = wc.CountWords();
+    }
+
+    FileManager fm(outputDir);
+    if (exit_code == 0) {
         fm.SaveResult("Success");
-    else
-        fm.SaveResult("FAIL "+std::to_string(exit_code));
-}
-    //also sends teh exit code to teh shell
+        BOOST_LOG_TRIVIAL(info) << "Success.";
+    }
+    else {
+        fm.SaveResult("FAIL " + std::to_string(exit_code));
+        BOOST_LOG_TRIVIAL(error) << "Fail with error code  " << exit_code;
+    }
+
     return exit_code;
 }
