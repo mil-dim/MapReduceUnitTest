@@ -275,6 +275,7 @@ TEST(MainTest, TestAllDefaultValues) {
 
 }
 
+
 TEST(MainTest, NoInput) {
 
     int argc = 1;
@@ -284,7 +285,7 @@ TEST(MainTest, NoInput) {
     EXPECT_EQ(main_test(argc, argv), 1);
 }
 
-TEST(MainTest, DefaultWrong1) {
+TEST(MainTest, Wrong1) {
 
     int argc = 8;
     char* argv[] = {
@@ -300,7 +301,7 @@ TEST(MainTest, DefaultWrong1) {
     EXPECT_EQ(main_test(argc, argv), 5);
 }
 
-TEST(MainTest, DefaultWrong2) {
+TEST(MainTest, Wrong2) {
 
     int argc = 8;
     char* argv[] = {
@@ -315,7 +316,7 @@ TEST(MainTest, DefaultWrong2) {
     };
     EXPECT_EQ(main_test(argc, argv), 8);
 }
-TEST(MainTest, DefaultWrong3) {
+TEST(MainTest, Wrong3) {
 
     int argc = 8;
     char* argv[] = {
@@ -330,7 +331,7 @@ TEST(MainTest, DefaultWrong3) {
     };
     EXPECT_EQ(main_test(argc, argv), 5);
 }
-TEST(MainTest, DefaultWrong4) {
+TEST(MainTest,Wrong4) {
 
     int argc = 8;
     char* argv[] = {
@@ -345,7 +346,7 @@ TEST(MainTest, DefaultWrong4) {
     };
     EXPECT_EQ(main_test(argc, argv), 13);
 }
-TEST(MainTest, DefaultWrong5) {
+TEST(MainTest, Wrong5) {
 
     int argc = 8;
     char* argv[] = {
@@ -360,7 +361,7 @@ TEST(MainTest, DefaultWrong5) {
     };
     EXPECT_EQ(main_test(argc, argv), 15);
 }
-TEST(MainTest, DefaultWrong6) {
+TEST(MainTest,Wrong6) {
 
     int argc = 8;
     char* argv[] = {
@@ -375,7 +376,7 @@ TEST(MainTest, DefaultWrong6) {
     };
     EXPECT_EQ(main_test(argc, argv), 12);
 }
-TEST(MainTest, DefaultWrong7) {
+TEST(MainTest,Wrong7) {
 
     int argc = 8;
     char* argv[] = {
