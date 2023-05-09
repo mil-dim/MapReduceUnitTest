@@ -58,7 +58,7 @@ int Workflow::CountWords() {
                 for (int i = 0; i < R; i++) {
                     // calculate start and end positions for this part of the buffer
                     int start_pos = end_pos+1;
-                    end_pos = (i + 1  == R ) ? (int)buffer.size() : (((i+1)* (int)buffer.size())/4);
+                    end_pos = (i + 1  == R ) ? (int)buffer.size() : (((i+1)* (int)buffer.size())/R);
                     // Ensure the substring ends at a space, to avoid splitting words
                     while (end_pos < buffer.size() && buffer[end_pos] != ' ') {
                         end_pos++;
